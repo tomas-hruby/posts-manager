@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, useEffect, useRef } from "react";
 import { Post } from "@/lib/types";
 import PostModal from "./PostModal";
 import { useAppDispatch, useAppSelector } from "@/lib/store/hooks";
@@ -8,13 +8,14 @@ import {
   addPost,
   updatePost,
   deletePost,
-  setPage,
   setSortBy,
   setSortOrder,
   setSearch,
+  setPosts,
 } from "@/lib/store/postsSlice";
+import { fetchPostsClient } from "@/lib/api";
 
-// SortIcon component defined outside of render
+// SortIcon component
 function SortIcon({
   column,
   sortBy,
@@ -43,18 +44,121 @@ export default function PostsTable() {
 
   // Get state from Redux
   const posts = useAppSelector((state) => state.posts.posts);
-  const page = useAppSelector((state) => state.posts.page);
-  const limit = useAppSelector((state) => state.posts.limit);
   const sortBy = useAppSelector((state) => state.posts.sortBy);
   const sortOrder = useAppSelector((state) => state.posts.sortOrder);
   const search = useAppSelector((state) => state.posts.search);
 
-  // Local state for search input
+  // Local state
   const [searchInput, setSearchInput] = useState("");
-
-  // Modal state
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingPost, setEditingPost] = useState<Post | null>(null);
+  const [displayCount, setDisplayCount] = useState(10);
+  const [isLoading, setIsLoading] = useState(false);
+  const [initialLoadDone, setInitialLoadDone] = useState(false);
+  const observerTarget = useRef<HTMLDivElement>(null);
+
+  // Load all posts once on mount
+  useEffect(() => {
+    const loadAllPosts = async () => {
+      if (initialLoadDone) return;
+      setIsLoading(true);
+      try {
+        const response = await fetchPostsClient({
+          page: 1,
+          limit: 1000,
+          sortBy: "id",
+          sortOrder: "asc",
+          search: "",
+        });
+        dispatch(setPosts(response.data));
+        setInitialLoadDone(true);
+      } catch (error) {
+        console.error("Failed to load posts:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    loadAllPosts();
+  }, [dispatch, initialLoadDone]);
+
+  // Filter and sort posts
+  const filteredSortedPosts = useMemo(() => {
+    let filtered = [...posts];
+
+    // Apply search filter
+    if (search) {
+      const searchLower = search.toLowerCase();
+      filtered = filtered.filter(
+        (post) =>
+          post.title.toLowerCase().includes(searchLower) ||
+          post.body.toLowerCase().includes(searchLower)
+      );
+    }
+
+    // Apply sorting
+    filtered.sort((a, b) => {
+      // Special handling for createdAt
+      if (sortBy === "createdAt") {
+        const aDate = a.editedAt
+          ? new Date(a.editedAt).getTime()
+          : a.createdAt
+          ? new Date(a.createdAt).getTime()
+          : 0;
+        const bDate = b.editedAt
+          ? new Date(b.editedAt).getTime()
+          : b.createdAt
+          ? new Date(b.createdAt).getTime()
+          : 0;
+
+        return sortOrder === "asc" ? aDate - bDate : bDate - aDate;
+      }
+
+      const aVal = a[sortBy];
+      const bVal = b[sortBy];
+
+      if (typeof aVal === "string" && typeof bVal === "string") {
+        return sortOrder === "asc"
+          ? aVal.localeCompare(bVal)
+          : bVal.localeCompare(aVal);
+      }
+
+      return sortOrder === "asc"
+        ? (aVal as number) - (bVal as number)
+        : (bVal as number) - (aVal as number);
+    });
+
+    return filtered;
+  }, [posts, search, sortBy, sortOrder]);
+
+  // Get displayed posts based on displayCount
+  const displayedPosts = useMemo(() => {
+    return filteredSortedPosts.slice(0, displayCount);
+  }, [filteredSortedPosts, displayCount]);
+
+  const hasMore = displayCount < filteredSortedPosts.length;
+
+  // Intersection Observer for infinite scroll
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasMore && !isLoading) {
+          setDisplayCount((prev) => prev + 10);
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    const currentTarget = observerTarget.current;
+    if (currentTarget) {
+      observer.observe(currentTarget);
+    }
+
+    return () => {
+      if (currentTarget) {
+        observer.unobserve(currentTarget);
+      }
+    };
+  }, [hasMore, isLoading]);
 
   // Callbacks for post mutations
   const handlePostCreated = useCallback(
@@ -86,62 +190,6 @@ export default function PostsTable() {
     [dispatch]
   );
 
-  // Client-side filtering, sorting, and pagination
-  const { paginatedPosts, total, totalPages } = useMemo(() => {
-    let filtered = [...posts];
-
-    // Apply search filter
-    if (search) {
-      const searchLower = search.toLowerCase();
-      filtered = filtered.filter(
-        (post) =>
-          post.title.toLowerCase().includes(searchLower) ||
-          post.body.toLowerCase().includes(searchLower)
-      );
-    }
-
-    // Apply sorting
-    filtered.sort((a, b) => {
-      // Special handling for createdAt - use editedAt if available, otherwise createdAt
-      if (sortBy === "createdAt") {
-        const aDate = a.editedAt
-          ? new Date(a.editedAt).getTime()
-          : a.createdAt
-          ? new Date(a.createdAt).getTime()
-          : 0;
-        const bDate = b.editedAt
-          ? new Date(b.editedAt).getTime()
-          : b.createdAt
-          ? new Date(b.createdAt).getTime()
-          : 0;
-
-        return sortOrder === "asc" ? aDate - bDate : bDate - aDate;
-      }
-
-      const aVal = a[sortBy];
-      const bVal = b[sortBy];
-
-      if (typeof aVal === "string" && typeof bVal === "string") {
-        return sortOrder === "asc"
-          ? aVal.localeCompare(bVal)
-          : bVal.localeCompare(aVal);
-      }
-
-      return sortOrder === "asc"
-        ? (aVal as number) - (bVal as number)
-        : (bVal as number) - (aVal as number);
-    });
-
-    // Calculate pagination
-    const total = filtered.length;
-    const totalPages = Math.ceil(total / limit);
-    const start = (page - 1) * limit;
-    const end = start + limit;
-    const paginatedPosts = filtered.slice(start, end);
-
-    return { paginatedPosts, total, totalPages };
-  }, [posts, search, sortBy, sortOrder, page, limit]);
-
   // Handle sorting
   const handleSort = useCallback(
     (column: "id" | "title" | "createdAt") => {
@@ -151,6 +199,7 @@ export default function PostsTable() {
         dispatch(setSortBy(column));
         dispatch(setSortOrder("asc"));
       }
+      setDisplayCount(10); // Reset display count on sort
     },
     [sortBy, sortOrder, dispatch]
   );
@@ -160,6 +209,7 @@ export default function PostsTable() {
     (e: React.FormEvent) => {
       e.preventDefault();
       dispatch(setSearch(searchInput));
+      setDisplayCount(10); // Reset display count on search
     },
     [searchInput, dispatch]
   );
@@ -192,29 +242,40 @@ export default function PostsTable() {
     setEditingPost(null);
   }, []);
 
+  if (!initialLoadDone && isLoading) {
+    return (
+      <div className="w-full space-y-4">
+        <div className="flex justify-center items-center py-12">
+          <div className="text-gray-300">Loading posts...</div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="w-full space-y-4">
       {/* Header with Add Button */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <h2 className="text-2xl font-bold text-white">Posts</h2>
+        <p className="text-gray-300">
+          Showing {displayedPosts.length} of {filteredSortedPosts.length} posts
+        </p>
         <button
           onClick={handleAddNew}
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-900 transition-colors"
-          aria-label="Add new post"
+          className="px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg shadow-md transition-colors focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:ring-offset-gray-800"
         >
           + Add New Post
         </button>
       </div>
 
-      {/* Filters */}
-      <div className="flex flex-col lg:flex-row gap-4 bg-gray-800 p-4 rounded-lg shadow-sm border border-gray-700">
-        <form onSubmit={handleSearch} className="flex-1 flex gap-2">
+      {/* Search Bar */}
+      <div className="bg-gray-800 p-4 rounded-lg border border-gray-700">
+        <form onSubmit={handleSearch} className="flex gap-2">
           <input
             type="text"
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
             placeholder="Search posts..."
-            className="flex-1 px-4 py-2 bg-gray-900 border border-gray-600 text-white placeholder-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="flex-1 px-4 py-2 bg-gray-700 text-white rounded-lg border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
             aria-label="Search posts"
           />
           <button
@@ -233,13 +294,6 @@ export default function PostsTable() {
         <button
           onClick={() => handleSort("title")}
           className="flex items-center gap-2 px-3 py-1 text-sm font-medium text-gray-200 hover:text-white bg-gray-700 hover:bg-gray-600 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-          aria-label={`Sort by Title ${
-            sortBy === "title"
-              ? sortOrder === "asc"
-                ? "descending"
-                : "ascending"
-              : ""
-          }`}
         >
           Title{" "}
           <SortIcon column="title" sortBy={sortBy} sortOrder={sortOrder} />
@@ -247,13 +301,6 @@ export default function PostsTable() {
         <button
           onClick={() => handleSort("createdAt")}
           className="flex items-center gap-2 px-3 py-1 text-sm font-medium text-gray-200 hover:text-white bg-gray-700 hover:bg-gray-600 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-          aria-label={`Sort by Date ${
-            sortBy === "createdAt"
-              ? sortOrder === "asc"
-                ? "descending"
-                : "ascending"
-              : ""
-          }`}
         >
           Date Created{" "}
           <SortIcon column="createdAt" sortBy={sortBy} sortOrder={sortOrder} />
@@ -262,12 +309,12 @@ export default function PostsTable() {
 
       {/* Posts */}
       <div className="space-y-4">
-        {paginatedPosts.length === 0 ? (
+        {displayedPosts.length === 0 ? (
           <div className="bg-gray-800 rounded-lg shadow-md p-8 border border-gray-700 text-center text-gray-400">
             No posts found
           </div>
         ) : (
-          paginatedPosts.map((post: Post) => (
+          displayedPosts.map((post: Post) => (
             <article
               key={post.id}
               className="bg-gray-800 rounded-lg shadow-md p-6 border border-gray-700 hover:border-gray-600 transition-colors"
@@ -342,38 +389,18 @@ export default function PostsTable() {
             </article>
           ))
         )}
-      </div>
 
-      {/* Pagination */}
-      {totalPages > 1 && (
-        <div className="bg-gray-800 px-6 py-4 rounded-lg border border-gray-700 flex flex-col sm:flex-row justify-between items-center gap-4">
-          <p className="text-sm text-gray-300">
-            Showing {(page - 1) * limit + 1} to {Math.min(page * limit, total)}{" "}
-            of {total} results
-          </p>
-          <nav className="flex gap-2" aria-label="Pagination">
-            <button
-              onClick={() => dispatch(setPage(Math.max(1, page - 1)))}
-              disabled={page === 1}
-              className="px-4 py-2 border border-gray-600 bg-gray-700 text-gray-200 rounded-lg hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-blue-500"
-              aria-label="Previous page"
-            >
-              Previous
-            </button>
-            <span className="px-4 py-2 text-sm text-gray-300 flex items-center">
-              Page {page} of {totalPages}
-            </span>
-            <button
-              onClick={() => dispatch(setPage(Math.min(totalPages, page + 1)))}
-              disabled={page === totalPages}
-              className="px-4 py-2 border border-gray-600 bg-gray-700 text-gray-200 rounded-lg hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-blue-500"
-              aria-label="Next page"
-            >
-              Next
-            </button>
-          </nav>
-        </div>
-      )}
+        {/* Infinite scroll trigger */}
+        {hasMore && (
+          <div ref={observerTarget} className="py-8 text-center">
+            <div className="text-gray-400">Loading more posts...</div>
+          </div>
+        )}
+
+        {!hasMore && displayedPosts.length > 0 && (
+          <div className="py-8 text-center text-gray-400">All posts loaded</div>
+        )}
+      </div>
 
       {/* Modal */}
       {isModalOpen && (

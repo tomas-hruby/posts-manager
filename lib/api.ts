@@ -2,14 +2,14 @@ import { Post, PaginationParams, PaginatedResponse } from "./types";
 
 const API_BASE_URL = "https://jsonplaceholder.typicode.com";
 
-// Fetch posts with server-side pagination, sorting, and filtering
-export async function fetchPosts(
+// Client-side fetch for infinite scroll
+export async function fetchPostsClient(
   params: PaginationParams
 ): Promise<PaginatedResponse<Post>> {
   const { page, limit, sortBy = "id", sortOrder = "asc", search } = params;
 
   const response = await fetch(`${API_BASE_URL}/posts`, {
-    next: { revalidate: 3600 }, // Cache for 1 hour
+    cache: "force-cache", // Cache on client side
   });
   if (!response.ok) {
     throw new Error("Failed to fetch posts");

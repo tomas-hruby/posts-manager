@@ -1,24 +1,14 @@
 import PostsTable from "@/components/PostsTable";
-import { fetchPosts } from "@/lib/api";
 import StoreProvider from "@/lib/store/StoreProvider";
 
 export const metadata = {
   title: "Posts Manager",
-  description: "Manage posts with pagination, sorting, and filtering",
+  description: "Manage posts with infinite scroll and on-demand data fetching",
 };
 
 export default async function Home() {
-  // Fetch ALL posts once on initial page load
-  const data = await fetchPosts({
-    page: 1,
-    limit: 1000, // Get all posts at once
-    sortBy: "id",
-    sortOrder: "asc",
-    search: "",
-  });
-
   return (
-    <StoreProvider initialPosts={data.data}>
+    <StoreProvider initialPosts={[]}>
       <main className="min-h-screen bg-linear-to-br from-gray-900 to-gray-800">
         <div className="container mx-auto px-4 py-8">
           <header className="mb-8">
