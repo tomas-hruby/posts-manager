@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { Post } from "@/lib/types";
 import PostModal from "./PostModal";
 import { useAppDispatch, useAppSelector } from "@/lib/store/hooks";
@@ -57,25 +57,34 @@ export default function PostsTable() {
   const [editingPost, setEditingPost] = useState<Post | null>(null);
 
   // Callbacks for post mutations
-  const handlePostCreated = (newPost: Post) => {
-    const postWithTimestamp = {
-      ...newPost,
-      createdAt: new Date().toISOString(),
-    };
-    dispatch(addPost(postWithTimestamp));
-  };
+  const handlePostCreated = useCallback(
+    (newPost: Post) => {
+      const postWithTimestamp = {
+        ...newPost,
+        createdAt: new Date().toISOString(),
+      };
+      dispatch(addPost(postWithTimestamp));
+    },
+    [dispatch]
+  );
 
-  const handlePostUpdated = (updatedPost: Post) => {
-    const postWithEditTimestamp = {
-      ...updatedPost,
-      editedAt: new Date().toISOString(),
-    };
-    dispatch(updatePost(postWithEditTimestamp));
-  };
+  const handlePostUpdated = useCallback(
+    (updatedPost: Post) => {
+      const postWithEditTimestamp = {
+        ...updatedPost,
+        editedAt: new Date().toISOString(),
+      };
+      dispatch(updatePost(postWithEditTimestamp));
+    },
+    [dispatch]
+  );
 
-  const handlePostDeleted = (deletedId: number) => {
-    dispatch(deletePost(deletedId));
-  };
+  const handlePostDeleted = useCallback(
+    (deletedId: number) => {
+      dispatch(deletePost(deletedId));
+    },
+    [dispatch]
+  );
 
   // Client-side filtering, sorting, and pagination
   const { paginatedPosts, total, totalPages } = useMemo(() => {
@@ -134,45 +143,54 @@ export default function PostsTable() {
   }, [posts, search, sortBy, sortOrder, page, limit]);
 
   // Handle sorting
-  const handleSort = (column: "id" | "title" | "createdAt") => {
-    if (sortBy === column) {
-      dispatch(setSortOrder(sortOrder === "asc" ? "desc" : "asc"));
-    } else {
-      dispatch(setSortBy(column));
-      dispatch(setSortOrder("asc"));
-    }
-  };
+  const handleSort = useCallback(
+    (column: "id" | "title" | "createdAt") => {
+      if (sortBy === column) {
+        dispatch(setSortOrder(sortOrder === "asc" ? "desc" : "asc"));
+      } else {
+        dispatch(setSortBy(column));
+        dispatch(setSortOrder("asc"));
+      }
+    },
+    [sortBy, sortOrder, dispatch]
+  );
 
   // Handle search
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    dispatch(setSearch(searchInput));
-  };
+  const handleSearch = useCallback(
+    (e: React.FormEvent) => {
+      e.preventDefault();
+      dispatch(setSearch(searchInput));
+    },
+    [searchInput, dispatch]
+  );
 
   // Handle delete
-  const handleDelete = (id: number) => {
-    if (window.confirm("Are you sure you want to delete this post?")) {
-      handlePostDeleted(id);
-    }
-  };
+  const handleDelete = useCallback(
+    (id: number) => {
+      if (window.confirm("Are you sure you want to delete this post?")) {
+        handlePostDeleted(id);
+      }
+    },
+    [handlePostDeleted]
+  );
 
   // Handle edit
-  const handleEdit = (post: Post) => {
+  const handleEdit = useCallback((post: Post) => {
     setEditingPost(post);
     setIsModalOpen(true);
-  };
+  }, []);
 
   // Handle add new
-  const handleAddNew = () => {
+  const handleAddNew = useCallback(() => {
     setEditingPost(null);
     setIsModalOpen(true);
-  };
+  }, []);
 
   // Handle modal close
-  const handleModalClose = () => {
+  const handleModalClose = useCallback(() => {
     setIsModalOpen(false);
     setEditingPost(null);
-  };
+  }, []);
 
   return (
     <div className="w-full space-y-4">

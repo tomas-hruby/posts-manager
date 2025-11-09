@@ -2,6 +2,11 @@ import PostsTable from "@/components/PostsTable";
 import { fetchPosts } from "@/lib/api";
 import StoreProvider from "@/lib/store/StoreProvider";
 
+export const metadata = {
+  title: "Posts Manager",
+  description: "Manage posts with pagination, sorting, and filtering",
+};
+
 export default async function Home() {
   // Fetch ALL posts once on initial page load
   const data = await fetchPosts({

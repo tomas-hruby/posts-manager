@@ -8,7 +8,9 @@ export async function fetchPosts(
 ): Promise<PaginatedResponse<Post>> {
   const { page, limit, sortBy = "id", sortOrder = "asc", search } = params;
 
-  const response = await fetch(`${API_BASE_URL}/posts`);
+  const response = await fetch(`${API_BASE_URL}/posts`, {
+    next: { revalidate: 3600 }, // Cache for 1 hour
+  });
   if (!response.ok) {
     throw new Error("Failed to fetch posts");
   }

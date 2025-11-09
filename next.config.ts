@@ -1,7 +1,34 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  // Enable React strict mode for better development experience
+  reactStrictMode: true,
+
+  // Optimize production builds
+  compress: true,
+
+  // Configure headers for security
+  async headers() {
+    return [
+      {
+        source: "/(.*)",
+        headers: [
+          {
+            key: "X-Content-Type-Options",
+            value: "nosniff",
+          },
+          {
+            key: "X-Frame-Options",
+            value: "DENY",
+          },
+          {
+            key: "X-XSS-Protection",
+            value: "1; mode=block",
+          },
+        ],
+      },
+    ];
+  },
 };
 
 export default nextConfig;
