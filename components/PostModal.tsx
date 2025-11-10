@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Post } from "@/lib/types";
+import { useToast } from "@/lib/toast/ToastContext";
 
 interface PostModalProps {
   post: Post | null;
@@ -17,6 +18,7 @@ export default function PostModal({
   onPostUpdated,
 }: PostModalProps) {
   const [error, setError] = useState<string | null>(null);
+  const { addToast } = useToast();
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -26,28 +28,42 @@ export default function PostModal({
     const title = formData.get("title") as string;
     const body = formData.get("body") as string;
 
+    if (!title.trim()) {
+      const errorMsg = "Title is required";
+      setError(errorMsg);
+      addToast(errorMsg, "error");
+      return;
+    }
+
+    if (!body.trim()) {
+      const errorMsg = "Body is required";
+      setError(errorMsg);
+      addToast(errorMsg, "error");
+      return;
+    }
+
     try {
       if (post) {
-        // Update existing post
         const updatedPost: Post = {
           ...post,
-          title,
-          body,
+          title: title.trim(),
+          body: body.trim(),
         };
         onPostUpdated(updatedPost);
       } else {
-        // Create new post with temporary ID
         const newPost: Post = {
-          id: Date.now(), // Use timestamp as temporary ID
+          id: Date.now(),
           userId: 1,
-          title,
-          body,
+          title: title.trim(),
+          body: body.trim(),
         };
         onPostCreated(newPost);
       }
       onClose();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred");
+      const errorMsg = err instanceof Error ? err.message : "An error occurred";
+      setError(errorMsg);
+      addToast(errorMsg, "error");
     }
   };
 

@@ -14,8 +14,8 @@ import {
   setPosts,
 } from "@/lib/store/postsSlice";
 import { fetchPostsClient } from "@/lib/api";
+import { useToast } from "@/lib/toast/ToastContext";
 
-// SortIcon component
 function SortIcon({
   column,
   sortBy,
@@ -41,14 +41,13 @@ function SortIcon({
 
 export default function PostsTable() {
   const dispatch = useAppDispatch();
+  const { addToast } = useToast();
 
-  // Get state from Redux
   const posts = useAppSelector((state) => state.posts.posts);
   const sortBy = useAppSelector((state) => state.posts.sortBy);
   const sortOrder = useAppSelector((state) => state.posts.sortOrder);
   const search = useAppSelector((state) => state.posts.search);
 
-  // Local state
   const [searchInput, setSearchInput] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingPost, setEditingPost] = useState<Post | null>(null);
@@ -57,7 +56,6 @@ export default function PostsTable() {
   const [initialLoadDone, setInitialLoadDone] = useState(false);
   const observerTarget = useRef<HTMLDivElement>(null);
 
-  // Load all posts once on mount
   useEffect(() => {
     const loadAllPosts = async () => {
       if (initialLoadDone) return;
@@ -74,18 +72,17 @@ export default function PostsTable() {
         setInitialLoadDone(true);
       } catch (error) {
         console.error("Failed to load posts:", error);
+        addToast("Failed to load posts. Please try again.", "error");
       } finally {
         setIsLoading(false);
       }
     };
     loadAllPosts();
-  }, [dispatch, initialLoadDone]);
+  }, [dispatch, initialLoadDone, addToast]);
 
-  // Filter and sort posts
   const filteredSortedPosts = useMemo(() => {
     let filtered = [...posts];
 
-    // Apply search filter
     if (search) {
       const searchLower = search.toLowerCase();
       filtered = filtered.filter(
@@ -95,9 +92,7 @@ export default function PostsTable() {
       );
     }
 
-    // Apply sorting
     filtered.sort((a, b) => {
-      // Special handling for createdAt
       if (sortBy === "createdAt") {
         const aDate = a.editedAt
           ? new Date(a.editedAt).getTime()
@@ -130,14 +125,12 @@ export default function PostsTable() {
     return filtered;
   }, [posts, search, sortBy, sortOrder]);
 
-  // Get displayed posts based on displayCount
   const displayedPosts = useMemo(() => {
     return filteredSortedPosts.slice(0, displayCount);
   }, [filteredSortedPosts, displayCount]);
 
   const hasMore = displayCount < filteredSortedPosts.length;
 
-  // Intersection Observer for infinite scroll
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -160,7 +153,6 @@ export default function PostsTable() {
     };
   }, [hasMore, isLoading]);
 
-  // Callbacks for post mutations
   const handlePostCreated = useCallback(
     (newPost: Post) => {
       const postWithTimestamp = {
@@ -168,8 +160,9 @@ export default function PostsTable() {
         createdAt: new Date().toISOString(),
       };
       dispatch(addPost(postWithTimestamp));
+      addToast("Post created successfully!", "success");
     },
-    [dispatch]
+    [dispatch, addToast]
   );
 
   const handlePostUpdated = useCallback(
@@ -179,18 +172,19 @@ export default function PostsTable() {
         editedAt: new Date().toISOString(),
       };
       dispatch(updatePost(postWithEditTimestamp));
+      addToast("Post updated successfully!", "success");
     },
-    [dispatch]
+    [dispatch, addToast]
   );
 
   const handlePostDeleted = useCallback(
     (deletedId: number) => {
       dispatch(deletePost(deletedId));
+      addToast("Post deleted successfully!", "success");
     },
-    [dispatch]
+    [dispatch, addToast]
   );
 
-  // Handle sorting
   const handleSort = useCallback(
     (column: "id" | "title" | "createdAt") => {
       if (sortBy === column) {
@@ -199,22 +193,20 @@ export default function PostsTable() {
         dispatch(setSortBy(column));
         dispatch(setSortOrder("asc"));
       }
-      setDisplayCount(10); // Reset display count on sort
+      setDisplayCount(10);
     },
     [sortBy, sortOrder, dispatch]
   );
 
-  // Handle search
   const handleSearch = useCallback(
     (e: React.FormEvent) => {
       e.preventDefault();
       dispatch(setSearch(searchInput));
-      setDisplayCount(10); // Reset display count on search
+      setDisplayCount(10);
     },
     [searchInput, dispatch]
   );
 
-  // Handle delete
   const handleDelete = useCallback(
     (id: number) => {
       if (window.confirm("Are you sure you want to delete this post?")) {
@@ -224,19 +216,16 @@ export default function PostsTable() {
     [handlePostDeleted]
   );
 
-  // Handle edit
   const handleEdit = useCallback((post: Post) => {
     setEditingPost(post);
     setIsModalOpen(true);
   }, []);
 
-  // Handle add new
   const handleAddNew = useCallback(() => {
     setEditingPost(null);
     setIsModalOpen(true);
   }, []);
 
-  // Handle modal close
   const handleModalClose = useCallback(() => {
     setIsModalOpen(false);
     setEditingPost(null);
