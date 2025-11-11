@@ -7,13 +7,10 @@ export default function Loading() {
         </header>
 
         <div className="space-y-4">
-          {/* Search bar skeleton */}
           <div className="h-12 bg-gray-800 rounded-lg border border-gray-700 animate-pulse" />
 
-          {/* Sort controls skeleton */}
           <div className="h-12 bg-gray-800 rounded-lg border border-gray-700 animate-pulse" />
 
-          {/* Posts skeleton */}
           {[1, 2, 3, 4, 5].map((i) => (
             <div
               key={i}
@@ -27,7 +24,6 @@ export default function Loading() {
             </div>
           ))}
 
-          {/* Pagination skeleton */}
           <div className="h-16 bg-gray-800 rounded-lg border border-gray-700 animate-pulse" />
         </div>
       </div>

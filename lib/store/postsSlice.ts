@@ -27,7 +27,6 @@ const postsSlice = createSlice({
       state.posts = action.payload;
     },
     addPost: (state, action: PayloadAction<Post>) => {
-      // Find the highest ID and add 1 to ensure new post appears first when sorted by ID
       const maxId = state.posts.reduce(
         (max, post) => Math.max(max, post.id),
         0
@@ -37,7 +36,7 @@ const postsSlice = createSlice({
         id: maxId + 1,
       };
       state.posts.unshift(newPost);
-      state.page = 1; // Reset to first page
+      state.page = 1;
     },
     updatePost: (state, action: PayloadAction<Post>) => {
       const index = state.posts.findIndex((p) => p.id === action.payload.id);
@@ -47,7 +46,7 @@ const postsSlice = createSlice({
     },
     deletePost: (state, action: PayloadAction<number>) => {
       state.posts = state.posts.filter((p) => p.id !== action.payload);
-      state.page = 1; // Reset to first page
+      state.page = 1;
     },
     setPage: (state, action: PayloadAction<number>) => {
       state.page = action.payload;

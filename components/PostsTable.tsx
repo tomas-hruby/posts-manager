@@ -243,7 +243,6 @@ export default function PostsTable() {
 
   return (
     <div className="w-full space-y-3 sm:space-y-4">
-      {/* Header with Add Button */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4">
         <p className="text-sm sm:text-base text-secondary-text">
           Showing {displayedPosts.length} of {filteredSortedPosts.length} posts
@@ -256,7 +255,6 @@ export default function PostsTable() {
         </button>
       </div>
 
-      {/* Search Bar */}
       <div className="p-3 sm:p-4 rounded-lg border bg-card-bg border-border">
         <form onSubmit={handleSearch} className="flex gap-2">
           <input
@@ -277,7 +275,6 @@ export default function PostsTable() {
         </form>
       </div>
 
-      {/* Sort Controls */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4 px-3 sm:px-4 py-3 rounded-lg border bg-card-bg border-border">
         <span className="text-xs sm:text-sm font-medium text-secondary-text">Sort by:</span>
         <div className="flex flex-wrap gap-2">
@@ -298,7 +295,6 @@ export default function PostsTable() {
         </div>
       </div>
 
-      {/* Posts */}
       <div className="space-y-3 sm:space-y-4">
         {displayedPosts.length === 0 ? (
           <div className="rounded-lg shadow-md p-6 sm:p-8 border text-center bg-card-bg border-border text-secondary-text">
@@ -381,7 +377,6 @@ export default function PostsTable() {
           ))
         )}
 
-        {/* Infinite scroll trigger */}
         {hasMore && (
           <div ref={observerTarget} className="py-6 sm:py-8 text-center">
             <div className="text-sm sm:text-base text-secondary-text">Loading more posts...</div>
@@ -393,7 +388,6 @@ export default function PostsTable() {
         )}
       </div>
 
-      {/* Modal */}
       {isModalOpen && (
         <PostModal
           post={editingPost}
