@@ -76,17 +76,17 @@ export default function PostModal({
       onClick={onClose}
     >
       <div
-        className="bg-gray-800 border border-gray-700 rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+        className="rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto border bg-surface border-border"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="p-4 sm:p-6">
           <div className="flex justify-between items-center mb-4 sm:mb-6">
-            <h2 id="modal-title" className="text-xl sm:text-2xl font-bold text-white">
+            <h2 id="modal-title" className="text-xl sm:text-2xl font-bold text-primary-text">
               {post ? "Edit Post" : "Create New Post"}
             </h2>
             <button
               onClick={onClose}
-              className="text-gray-400 hover:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded p-1"
+              className="hover:opacity-70 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded p-1 text-secondary-text"
               aria-label="Close modal"
             >
               <svg
@@ -108,7 +108,7 @@ export default function PostModal({
 
           {error && (
             <div
-              className="mb-3 sm:mb-4 p-2.5 sm:p-3 bg-red-950 border border-red-800 text-red-400 rounded-lg text-sm"
+              className="mb-3 sm:mb-4 p-2.5 sm:p-3 border rounded-lg text-sm bg-red-100/10 border-red-500 text-red-500"
               role="alert"
             >
               {error}
@@ -119,7 +119,7 @@ export default function PostModal({
             <div>
               <label
                 htmlFor="title"
-                className="block text-sm font-medium text-gray-200 mb-1.5"
+                className="block text-sm font-medium mb-1.5 text-primary-text"
               >
                 Title
               </label>
@@ -129,7 +129,7 @@ export default function PostModal({
                 name="title"
                 defaultValue={post?.title || ""}
                 required
-                className="w-full px-3 sm:px-4 py-2 text-sm sm:text-base bg-gray-900 border border-gray-600 text-white placeholder-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 sm:px-4 py-2 text-sm sm:text-base border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-input-bg text-primary-text border-border"
                 placeholder="Enter post title"
               />
             </div>
@@ -137,7 +137,7 @@ export default function PostModal({
             <div>
               <label
                 htmlFor="body"
-                className="block text-sm font-medium text-gray-200 mb-1.5"
+                className="block text-sm font-medium mb-1.5 text-primary-text"
               >
                 Body
               </label>
@@ -147,7 +147,7 @@ export default function PostModal({
                 defaultValue={post?.body || ""}
                 required
                 rows={6}
-                className="w-full px-3 sm:px-4 py-2 text-sm sm:text-base bg-gray-900 border border-gray-600 text-white placeholder-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-y"
+                className="w-full px-3 sm:px-4 py-2 text-sm sm:text-base border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-y bg-input-bg text-primary-text border-border"
                 placeholder="Enter post content"
               />
             </div>
@@ -156,13 +156,13 @@ export default function PostModal({
               <button
                 type="button"
                 onClick={onClose}
-                className="w-full sm:w-auto px-4 sm:px-6 py-2 border border-gray-600 text-gray-200 rounded-lg hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 focus:ring-offset-gray-800"
+                className="w-full sm:w-auto px-4 sm:px-6 py-2 border rounded-lg hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 focus:ring-offset-surface border-border text-primary-text bg-button-bg"
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                className="w-full sm:w-auto px-4 sm:px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-800"
+                className="w-full sm:w-auto px-4 sm:px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-surface"
               >
                 {post ? "Update Post" : "Create Post"}
               </button>

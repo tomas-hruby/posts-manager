@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { ToastProvider } from "@/lib/toast/ToastContext";
 import ToastContainer from "@/components/ToastContainer";
+import { ThemeProvider } from "@/lib/theme/ThemeContext";
 
 export const metadata: Metadata = {
   title: "Posts Manager - Next.js App",
@@ -21,12 +22,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className="bg-gray-900">
-        <ToastProvider>
-          {children}
-          <ToastContainer />
-        </ToastProvider>
+    <html lang="en" suppressHydrationWarning>
+      <body>
+        <ThemeProvider>
+          <ToastProvider>
+            {children}
+            <ToastContainer />
+          </ToastProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

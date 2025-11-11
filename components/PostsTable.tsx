@@ -27,7 +27,7 @@ function SortIcon({
 }) {
   if (sortBy !== column) {
     return (
-      <span className="text-gray-400" aria-hidden="true">
+      <span className="text-secondary-text" aria-hidden="true">
         ⇅
       </span>
     );
@@ -235,7 +235,7 @@ export default function PostsTable() {
     return (
       <div className="w-full space-y-4">
         <div className="flex justify-center items-center py-12">
-          <div className="text-gray-300">Loading posts...</div>
+          <div className="text-secondary-text">Loading posts...</div>
         </div>
       </div>
     );
@@ -245,31 +245,31 @@ export default function PostsTable() {
     <div className="w-full space-y-3 sm:space-y-4">
       {/* Header with Add Button */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4">
-        <p className="text-sm sm:text-base text-gray-300">
+        <p className="text-sm sm:text-base text-secondary-text">
           Showing {displayedPosts.length} of {filteredSortedPosts.length} posts
         </p>
         <button
           onClick={handleAddNew}
-          className="w-full sm:w-auto px-4 sm:px-6 py-2.5 sm:py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg shadow-md transition-colors focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:ring-offset-gray-800"
+          className="w-full sm:w-auto px-4 sm:px-6 py-2.5 sm:py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg shadow-md transition-colors focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:ring-offset-background"
         >
           + Add New Post
         </button>
       </div>
 
       {/* Search Bar */}
-      <div className="bg-gray-800 p-3 sm:p-4 rounded-lg border border-gray-700">
+      <div className="p-3 sm:p-4 rounded-lg border bg-card-bg border-border">
         <form onSubmit={handleSearch} className="flex gap-2">
           <input
             type="text"
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
             placeholder="Search posts..."
-            className="flex-1 px-3 sm:px-4 py-2 text-sm sm:text-base bg-gray-700 text-white rounded-lg border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="flex-1 px-3 sm:px-4 py-2 text-sm sm:text-base rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-500 bg-input-bg text-primary-text border-border"
             aria-label="Search posts"
           />
           <button
             type="submit"
-            className="px-3 sm:px-4 py-2 text-sm sm:text-base bg-gray-700 text-white rounded-lg hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 focus:ring-offset-gray-800"
+            className="px-3 sm:px-4 py-2 text-sm sm:text-base rounded-lg hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 focus:ring-offset-background bg-button-bg text-primary-text"
             aria-label="Submit search"
           >
             Search
@@ -278,19 +278,19 @@ export default function PostsTable() {
       </div>
 
       {/* Sort Controls */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4 bg-gray-800 px-3 sm:px-4 py-3 rounded-lg border border-gray-700">
-        <span className="text-xs sm:text-sm text-gray-300 font-medium">Sort by:</span>
+      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4 px-3 sm:px-4 py-3 rounded-lg border bg-card-bg border-border">
+        <span className="text-xs sm:text-sm font-medium text-secondary-text">Sort by:</span>
         <div className="flex flex-wrap gap-2">
           <button
             onClick={() => handleSort("title")}
-            className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 sm:py-1 text-xs sm:text-sm font-medium text-gray-200 hover:text-white bg-gray-700 hover:bg-gray-600 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 sm:py-1 text-xs sm:text-sm font-medium hover:opacity-90 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 bg-button-bg text-primary-text"
           >
             Title{" "}
             <SortIcon column="title" sortBy={sortBy} sortOrder={sortOrder} />
           </button>
           <button
             onClick={() => handleSort("createdAt")}
-            className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 sm:py-1 text-xs sm:text-sm font-medium text-gray-200 hover:text-white bg-gray-700 hover:bg-gray-600 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 sm:py-1 text-xs sm:text-sm font-medium hover:opacity-90 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 bg-button-bg text-primary-text"
           >
             Date Created{" "}
             <SortIcon column="createdAt" sortBy={sortBy} sortOrder={sortOrder} />
@@ -301,26 +301,26 @@ export default function PostsTable() {
       {/* Posts */}
       <div className="space-y-3 sm:space-y-4">
         {displayedPosts.length === 0 ? (
-          <div className="bg-gray-800 rounded-lg shadow-md p-6 sm:p-8 border border-gray-700 text-center text-gray-400">
+          <div className="rounded-lg shadow-md p-6 sm:p-8 border text-center bg-card-bg border-border text-secondary-text">
             No posts found
           </div>
         ) : (
           displayedPosts.map((post: Post) => (
             <article
               key={post.id}
-              className="bg-gray-800 rounded-lg shadow-md p-4 sm:p-6 border border-gray-700 hover:border-gray-600 transition-colors"
+              className="rounded-lg shadow-md p-4 sm:p-6 border hover:opacity-95 transition-all bg-card-bg border-border"
             >
               <div className="flex flex-col gap-3 mb-3 sm:mb-4">
                 <div className="flex-1">
-                  <h3 className="text-lg sm:text-xl font-bold text-white capitalize leading-tight">
+                  <h3 className="text-lg sm:text-xl font-bold capitalize leading-tight text-primary-text">
                     {post.title}
                   </h3>
                   {post.editedAt ? (
-                    <p className="text-xs text-gray-400 mt-1">
+                    <p className="text-xs mt-1 text-secondary-text">
                       Edited: {new Date(post.editedAt).toLocaleString()}
                     </p>
                   ) : post.createdAt ? (
-                    <p className="text-xs text-gray-400 mt-1">
+                    <p className="text-xs mt-1 text-secondary-text">
                       Created: {new Date(post.createdAt).toLocaleString()}
                     </p>
                   ) : null}
@@ -328,7 +328,7 @@ export default function PostsTable() {
                 <div className="flex gap-2 w-full sm:w-auto">
                   <button
                     onClick={() => handleEdit(post)}
-                    className="flex-1 sm:flex-none px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-800"
+                    className="flex-1 sm:flex-none px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-background"
                     aria-label={`Edit post ${post.id}`}
                   >
                     <span className="flex items-center justify-center gap-1.5">
@@ -351,7 +351,7 @@ export default function PostsTable() {
                   </button>
                   <button
                     onClick={() => handleDelete(post.id)}
-                    className="flex-1 sm:flex-none px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:ring-offset-gray-800 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="flex-1 sm:flex-none px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:ring-offset-background disabled:opacity-50 disabled:cursor-not-allowed"
                     aria-label={`Delete post ${post.id}`}
                   >
                     <span className="flex items-center justify-center gap-1.5">
@@ -374,7 +374,7 @@ export default function PostsTable() {
                   </button>
                 </div>
               </div>
-              <p className="text-sm sm:text-base text-gray-300 leading-relaxed whitespace-pre-wrap wrap-break-word">
+              <p className="text-sm sm:text-base leading-relaxed whitespace-pre-wrap wrap-break-word text-primary-text">
                 {post.body}
               </p>
             </article>
@@ -384,12 +384,12 @@ export default function PostsTable() {
         {/* Infinite scroll trigger */}
         {hasMore && (
           <div ref={observerTarget} className="py-6 sm:py-8 text-center">
-            <div className="text-sm sm:text-base text-gray-400">Loading more posts...</div>
+            <div className="text-sm sm:text-base text-secondary-text">Loading more posts...</div>
           </div>
         )}
 
         {!hasMore && displayedPosts.length > 0 && (
-          <div className="py-6 sm:py-8 text-center text-sm sm:text-base text-gray-400">All posts loaded</div>
+          <div className="py-6 sm:py-8 text-center text-sm sm:text-base text-secondary-text">All posts loaded</div>
         )}
       </div>
 
