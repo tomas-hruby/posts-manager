@@ -16,7 +16,7 @@ export interface User {
 export interface PaginationParams {
   page: number;
   limit: number;
-  sortBy?: "id" | "title";
+  sortBy?: "id" | "title" | "createdAt";
   sortOrder?: "asc" | "desc";
   search?: string;
 }

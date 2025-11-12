@@ -60,6 +60,13 @@ export default function PostsTable() {
   useEffect(() => {
     const loadAllPosts = async () => {
       if (initialLoadDone) return;
+      
+      // If posts are already loaded from SSR, skip fetching
+      if (posts.length > 0) {
+        setInitialLoadDone(true);
+        return;
+      }
+      
       setIsLoading(true);
       try {
         const response = await fetchPostsClient({
@@ -79,7 +86,7 @@ export default function PostsTable() {
       }
     };
     loadAllPosts();
-  }, [dispatch, initialLoadDone, addToast]);
+  }, [dispatch, initialLoadDone, addToast, posts.length]);
 
   const filteredSortedPosts = useMemo(() => {
     let filtered = [...posts];

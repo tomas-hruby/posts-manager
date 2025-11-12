@@ -2,6 +2,8 @@ import PostsTable from "@/components/PostsTable";
 import StoreProvider from "@/lib/store/StoreProvider";
 import ThemeToggle from "@/components/ThemeToggle";
 import type { Metadata } from "next";
+import { API_BASE_URL } from "@/lib/constants";
+import { Post } from "@/lib/types";
 
 export const metadata: Metadata = {
   title: "Posts Manager - Manage Your Posts Efficiently",
@@ -13,6 +15,22 @@ export const metadata: Metadata = {
 };
 
 export default async function Home() {
+  // Fetch initial posts server-side for better SEO and performance
+  let initialPosts: Post[] = [];
+  
+  try {
+    const response = await fetch(`${API_BASE_URL}/posts`, {
+      next: { revalidate: 3600 }, // Revalidate every hour
+    });
+    
+    if (response.ok) {
+      initialPosts = await response.json();
+    }
+  } catch (error) {
+    console.error("Failed to fetch initial posts:", error);
+    // Continue with empty array - client will retry
+  }
+
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "WebApplication",
@@ -34,7 +52,7 @@ export default async function Home() {
   };
 
   return (
-    <StoreProvider initialPosts={[]}>
+    <StoreProvider initialPosts={initialPosts}>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
