@@ -1,0 +1,40 @@
+{
+  "name": "Posts Manager - Efficient Post Management",
+  "short_name": "Posts Manager",
+  "description": "A modern, high-performance posts management application with infinite scroll, real-time filtering, and advanced sorting capabilities.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#0d6efd",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "any",
+      "type": "image/x-icon"
+    },
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable any"
+    }
+  ],
+  "categories": ["productivity", "utilities"],
+  "screenshots": [],
+  "shortcuts": [
+    {
+      "name": "Add New Post",
+      "short_name": "New Post",
+      "description": "Create a new post",
+      "url": "/?action=new",
+      "icons": []
+    }
+  ]
+}
