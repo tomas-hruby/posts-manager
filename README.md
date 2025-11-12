@@ -1,5 +1,9 @@
 # Posts Manager
 
+# Deployment
+
+This app is deployed [here](https://posts-manager-iota.vercel.app/)
+
 A modern posts management application built with Next.js 15, featuring infinite scroll, Redux state management, and real-time CRUD operations.
 
 ![Next.js](https://img.shields.io/badge/Next.js-15-black)
