@@ -1,6 +1,6 @@
 # Posts Manager
 
-# Deployment
+## Deployment
 
 This app is deployed [here](https://posts-manager-iota.vercel.app/)
 

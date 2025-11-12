@@ -1,6 +1,5 @@
 import { Post, PaginationParams, PaginatedResponse } from "./types";
-
-const API_BASE_URL = "https://jsonplaceholder.typicode.com";
+import { API_BASE_URL } from "./constants";
 
 export async function fetchPostsClient(
   params: PaginationParams
@@ -53,57 +52,4 @@ export async function fetchPostsClient(
     limit,
     totalPages,
   };
-}
-
-export async function fetchPost(id: number): Promise<Post> {
-  const response = await fetch(`${API_BASE_URL}/posts/${id}`);
-  if (!response.ok) {
-    throw new Error("Failed to fetch post");
-  }
-  return response.json();
-}
-
-export async function createPost(post: Omit<Post, "id">): Promise<Post> {
-  const response = await fetch(`${API_BASE_URL}/posts`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(post),
-  });
-
-  if (!response.ok) {
-    throw new Error("Failed to create post");
-  }
-
-  return response.json();
-}
-
-export async function updatePost(
-  id: number,
-  post: Partial<Post>
-): Promise<Post> {
-  const response = await fetch(`${API_BASE_URL}/posts/${id}`, {
-    method: "PATCH",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(post),
-  });
-
-  if (!response.ok) {
-    throw new Error("Failed to update post");
-  }
-
-  return response.json();
-}
-
-export async function deletePost(id: number): Promise<void> {
-  const response = await fetch(`${API_BASE_URL}/posts/${id}`, {
-    method: "DELETE",
-  });
-
-  if (!response.ok) {
-    throw new Error("Failed to delete post");
-  }
 }

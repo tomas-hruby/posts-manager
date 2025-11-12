@@ -39,11 +39,9 @@ This project includes comprehensive unit tests to ensure reliability and maintai
 
 #### `api.test.ts`
 - **fetchPostsClient**: Tests pagination, sorting, searching, and filtering
-- **fetchPost**: Tests fetching a single post by ID
-- **createPost**: Tests creating a new post
-- **updatePost**: Tests updating an existing post
-- **deletePost**: Tests deleting a post
 - **Error Handling**: Tests API failure scenarios
+
+> **Note**: Mutation operations (create, update, delete) are handled by Server Actions in `actions.ts` and are not tested in this file.
 
 ## Running Tests
 
